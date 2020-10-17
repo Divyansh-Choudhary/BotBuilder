@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Adapters;
@@ -26,6 +27,11 @@ namespace Microsoft.Bot.Builder.Dialogs.Adaptive.Testing
     /// <seealso cref="TestAdapter"/>
     public class TestScript
     {
+        /// <summary>
+        /// Test script ended event.
+        /// </summary>
+        public const string TestScriptEnded = "TestScriptEnded";
+
         /// <summary>
         /// Sets the Kind for this class. 
         /// </summary>
@@ -143,8 +149,9 @@ namespace Microsoft.Bot.Builder.Dialogs.Adaptive.Testing
         /// <param name="testName">Name of the test.</param>
         /// <param name="callback">The bot logic.</param>
         /// <param name="adapter">optional test adapter.</param>
+        /// <param name="languagePolicy">The default language policy.</param>
         /// <returns>Runs the exchange between the user and the bot.</returns>
-        public async Task ExecuteAsync(ResourceExplorer resourceExplorer, [CallerMemberName] string testName = null, BotCallbackHandler callback = null, TestAdapter adapter = null)
+        public async Task ExecuteAsync(ResourceExplorer resourceExplorer, [CallerMemberName] string testName = null, BotCallbackHandler callback = null, TestAdapter adapter = null, LanguagePolicy languagePolicy = null)
         {
             if (adapter == null)
             {
@@ -172,23 +179,24 @@ namespace Microsoft.Bot.Builder.Dialogs.Adaptive.Testing
                            async (turnContext, cancellationToken) => await di.InspectAsync(turnContext, inspector).ConfigureAwait(false)).ConfigureAwait(false);
             }
 
-            if (callback != null)
+            DialogManager dm;
+            if (callback == null)
             {
-                foreach (var testAction in Script)
-                {
-                    await testAction.ExecuteAsync(adapter, callback, Inspect).ConfigureAwait(false);
-                }
-            }
-            else
-            {
-                var dm = new DialogManager(Dialog)
+                dm = new DialogManager(Dialog)
                     .UseResourceExplorer(resourceExplorer)
                     .UseLanguageGeneration();
 
-                foreach (var testAction in Script)
+                if (languagePolicy != null)
                 {
-                    await testAction.ExecuteAsync(adapter, dm.OnTurnAsync, Inspect).ConfigureAwait(false);
+                    dm.UseLanguagePolicy(languagePolicy);
                 }
+
+                callback = dm.OnTurnAsync;
+            }
+
+            foreach (var testAction in Script)
+            {
+                await testAction.ExecuteAsync(adapter, callback, Inspect).ConfigureAwait(false);
             }
         }
 

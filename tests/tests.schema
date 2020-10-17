@@ -314,6 +314,9 @@
       "$ref": "#/definitions/Microsoft.Test.AssertCondition"
     },
     {
+      "$ref": "#/definitions/Microsoft.Test.AssertNoActivity"
+    },
+    {
       "$ref": "#/definitions/Microsoft.Test.AssertReply"
     },
     {
@@ -8318,6 +8321,41 @@
         }
       }
     },
+    "Microsoft.Test.AssertNoActivity": {
+      "$role": "implements(Microsoft.Test.ITestAction)",
+      "title": "Assert Reply Activity",
+      "description": "Asserts that there is no activity.",
+      "type": "object",
+      "required": [
+        "$kind"
+      ],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^\\$": {
+          "title": "Tooling property",
+          "description": "Open ended property for tooling."
+        }
+      },
+      "properties": {
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "The description of the assertion"
+        },
+        "$kind": {
+          "title": "Kind of dialog object",
+          "description": "Defines the valid properties for the component you are configuring (from a dialog .schema file)",
+          "type": "string",
+          "pattern": "^[a-zA-Z][a-zA-Z0-9.]*$",
+          "const": "Microsoft.Test.AssertNoActivity"
+        },
+        "$designer": {
+          "title": "Designer information",
+          "type": "object",
+          "description": "Extra information for the Bot Framework Composer."
+        }
+      }
+    },
     "Microsoft.Test.AssertReply": {
       "$role": "implements(Microsoft.Test.ITestAction)",
       "title": "Assert Reply",
@@ -8780,6 +8818,9 @@
           "type": "string",
           "title": "Reference to Microsoft.Test.ITestAction",
           "description": "Reference to Microsoft.Test.ITestAction .dialog file."
+        },
+        {
+          "$ref": "#/definitions/Microsoft.Test.AssertNoActivity"
         },
         {
           "$ref": "#/definitions/Microsoft.Test.AssertReply"
@@ -9735,7 +9776,7 @@
     },
     "Teams.GetMeetingParticipant": {
       "$role": "implements(Microsoft.IDialog)",
-      "title": "Get Meeting Participant",
+      "title": "Get meeting participant",
       "description": "Get teams meeting partipant information.",
       "type": "object",
       "required": [
@@ -9764,7 +9805,7 @@
         },
         "meetingId": {
           "$ref": "#/definitions/stringExpression",
-          "title": "MeetingId",
+          "title": "Meeting Id",
           "description": "Meeting Id or expression to a meetingId to use to get the participant information. Default value is the current turn.activity.channelData.meeting.id.",
           "examples": [
             "=turn.activity.channelData.meeting.id"
@@ -9772,7 +9813,7 @@
         },
         "participantId": {
           "$ref": "#/definitions/stringExpression",
-          "title": "ParticipantId",
+          "title": "Participant Id",
           "description": "Participant Id or expression to a participantId to use to get the participant information. Default value is the current turn.activity.from.aadObjectId.",
           "examples": [
             "=turn.activity.from.aadObjectId"
@@ -9780,7 +9821,7 @@
         },
         "tenantId": {
           "$ref": "#/definitions/stringExpression",
-          "title": "TenantId",
+          "title": "Tenant Id",
           "description": "Tenant Id or expression to a tenantId to use to get the participant information. Default value is the current $turn.activity.channelData.tenant.id.",
           "examples": [
             "=turn.activity.channelData.tenant.id"
